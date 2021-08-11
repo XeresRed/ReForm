@@ -1,6 +1,6 @@
 import React from 'react';
-import { FormValues, Values } from '../models/FormValues.models';
-import { ValidationRules, ValidationType } from '../models/Validators.models';
+import { FormValues, Values } from './models/FormValues.models';
+import { ValidationRules, ValidationType } from './models/Validators.models';
 
 export const useForm = <T>(InitialState: FormValues<T>) => {
     const [values, setValues] = React.useState(InitialState);
@@ -69,8 +69,17 @@ export const useForm = <T>(InitialState: FormValues<T>) => {
         errors,
         ValidateInput,
         ValidateSubmit,
-        SetValidators,
+        validators,
         addValidationRules
     }
     
+}
+
+export const Validators = {
+    Required: ()=> ({type: 'required', data: null}),
+    Email: (regex: string | null = null)=> ({type: 'email', data: regex}),
+    minLength: (length: number)=> ({type: 'minLength', data: length}),
+    maxLength: (length: number)=> ({type: 'maxLength', data: length}),
+    min: (length: number)=> ({type: 'min', data: length}),
+    max: (length: number)=> ({type: 'max', data: length})
 }
