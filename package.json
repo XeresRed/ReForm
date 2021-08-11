@@ -1,0 +1,21 @@
+{
+  "name": "reforms",
+  "version": "0.0.1",
+  "description": "This librarie help to create a reactive forms like angular",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
+  },
+  "keywords": [
+    "forms",
+    "react",
+    "reactive",
+    "custom"
+  ],
+  "author": "Juan Camilo Bonilla",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^4.3.5"
+  }
+}
