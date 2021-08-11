@@ -2,10 +2,12 @@
   "name": "reforms",
   "version": "0.0.1",
   "description": "This librarie help to create a reactive forms like angular",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "lint": "tslint -p tsconfig.json"
   },
   "keywords": [
     "forms",
@@ -15,7 +17,19 @@
   ],
   "author": "Juan Camilo Bonilla",
   "license": "ISC",
+  "peerDependencies": {
+    "react": "^16.8.0"
+  },
   "devDependencies": {
+    "@types/react": "^17.0.17",
+    "prettier": "^2.3.2",
+    "react": "^17.0.2",
+    "tslint": "^6.1.3",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^4.3.5"
-  }
+  },
+  "files": [
+    "/lib",
+    "package.json"
+  ]
 }
