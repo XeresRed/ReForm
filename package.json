@@ -1,6 +1,6 @@
 {
   "name": "react-reforms",
-  "version": "0.0.29",
+  "version": "0.0.34-alfa",
   "description": "This librarie help to create a reactive forms like angular",
   "main": "lib/index.js",
   "scripts": {

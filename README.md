@@ -2,6 +2,8 @@
 
 This is a minimal library to help improve your forms in react.
 
+[**DEMO**](https://codesandbox.io/s/demo-react-reforms-c9xjr?file=/src/styles.css)
+
 
 ## Quick start
 
@@ -12,7 +14,8 @@ const formStructure = {
 	firstName: {
 		value: "",
 		validators: [defaultValidators.Required()],
-		class: ''
+		class: '',
+        hasErrors: false
 	},
 	lastName: {
 		value: "",
@@ -90,8 +93,10 @@ Finally add our custom validator with the methods
 ```javascript
 function App() {
 	const {values, errors, ValidateInput, addValidationRules, setValidators} =  useForm(formStructure, {customClass: {error: 'error', success: 'success'}});
-	addValidationRules(CustomRulesValidations, {acceptData: false})
-	setValidators('repeatPass', [CustomValidators.repeatPass({bindField: {field:'firstName', activate: true}})]) // Aggregates the
+     React.useEffect( () => {
+        addValidationRules(CustomRulesValidations)
+        setValidators('repeatPass',  [CustomValidators.repeatPass({bindField: {field:'firstName', activate: true}})])
+    },[])
 	....
 ```
 

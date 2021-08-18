@@ -41,6 +41,7 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
     const ValidateInput = (id: string, value: any) => {
         const field: Values = values[id];
         let flagError = [];
+        let resultErrors = {};
         for (const validator of field.validators) {
             if (validator.extras) {
                 if (validator.extras.bindField && validator.extras.bindField.activate) {
@@ -58,24 +59,26 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
             const validation = validationRules[validator.type](value, validator);
             if (validation[validator.type]) {
                 flagError.push(false)
-                setErrors({
-                    ...errors,
-                    [id]: {...errors[id], ...validation}
-                })
-            } else {
-                setErrors({
-                    ...errors,
-                    [id]: {...errors[id], ...validation}
-                })
+            }
+
+            resultErrors = {
+                ...resultErrors,
+                [id]: {...resultErrors[id], ...validation}
             }
         }
+
+        setErrors({
+            ...errors,
+            ...resultErrors
+        })
 
         setValues({
             ...values,
             [id]: {
                 validators: values[id].validators,
                 value: value,
-                class: flagError.length === 0 ? config.customClass?.success : config.customClass?.error
+                class: flagError.length === 0 ? config.customClass?.success : config.customClass?.error,
+                hasErrors: !(flagError.length === 0)
             }
         });
 
