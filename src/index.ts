@@ -1,53 +1,110 @@
 import React from 'react';
+import { Config } from './models/Config';
 import { FormValues, Values } from './models/FormValues.models';
-import { ValidationRules, ValidationType } from './models/Validators.models';
+import { ValidationRules, ValidationType, Validators, ValidatorType, Primitives  } from './models/Validators.models';
 
-export const useForm = <T>(InitialState: FormValues<T>) => {
-    const [values, setValues] = React.useState(InitialState);
+
+
+const initConfig: Config = {
+    error: {intialize: false, default: false},
+    customClass: {success: "", error: ""},
+}
+
+export const useForm = (InitialState: FormValues, config: Config = initConfig) => {
+
+    const [values, setValues] = React.useState<FormValues>(InitialState);
     const [errors, setErrors] = React.useState({});
-    const [validators, SetValidators] = React.useState(ValidationRules);
+    const [validationRules, SetValidationRules]= React.useState<ValidationType>(ValidationRules);
 
-    const ValidateInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const field: Values<any> = values[event.target.name];
+    React.useEffect( () => {
+        if (config && config.error?.intialize) {
+            let initErrors = {}
+            Object.keys(values).forEach( key => {
+                const field: Values = values[key];
+                for (const validator of field.validators) {
+                    if (key in initErrors) {
+                        initErrors[key] = {
+                            ...initErrors[key],
+                            [validator.type]: config.error?.default
+                        }
+                    } else {
+                        initErrors[key] = {
+                            [validator.type]: config.error?.default
+                        }
+                    }
+                }
+            })
+        }
+    }, [])
+
+
+    const ValidateInput = (id: string, value: any) => {
+        const field: Values = values[id];
         let flagError = [];
         for (const validator of field.validators) {
-            const validation = validators[validator.type](event.target.value, validator);
-            if (validation) {
+            if (validator.extras) {
+                if (validator.extras.bindField && validator.extras.bindField.activate) {
+                    try {
+                        validator.data = values[validator.extras.bindField.field].value;
+                    } catch (error) {
+                        setErrors({
+                            ...errors,
+                            [id]: {...errors[id], ...{Exception: error}}
+                        })
+                        return;
+                    }
+                }
+            }
+            const validation = validationRules[validator.type](value, validator);
+            if (validation[validator.type]) {
                 flagError.push(false)
                 setErrors({
                     ...errors,
-                    [event.target.name]: [...errors[event.target.name], validation]
+                    [id]: {...errors[id], ...validation}
                 })
             } else {
                 setErrors({
                     ...errors,
-                    [event.target.name]: []
+                    [id]: {...errors[id], ...validation}
                 })
             }
         }
+
         setValues({
             ...values,
-            [event.target.name]: {
-                validators: values[event.target.name].validators,
-                value: event.target.value,
-                class: flagError.length === 0 ? 'success' : 'error'
+            [id]: {
+                validators: values[id].validators,
+                value: value,
+                class: flagError.length === 0 ? config.customClass?.success : config.customClass?.error
             }
         });
 
     }
 
-    const addValidationRules = <T, K>(newRules: ValidationType<T,K>) => {
-        SetValidators({
-            ...validators,
+    const addValidationRules = (newRules: ValidationType) => {
+        SetValidationRules({
+            ...validationRules,
             ...newRules
         })
     }
 
+    const setValidators= <T>(formField: string, validator: ValidatorType<Primitives<T>>[]) => {
+        if (!(formField in values)) return false
+
+        const val = {...values[formField]}
+        val.validators = validator
+        setValues({
+            ...values,
+            [formField]: val
+        });
+        return true
+    }
+
     const ValidateSubmit = () => {
         for (const keyValue of Object.keys(values)) {
-            const field: Values<any> = values[keyValue];
+            const field: Values = values[keyValue];
             for (const validator of field.validators) {
-                const validation = validators[validator.type](field.value, validator);
+                const validation = validationRules[validator.type](field.value, validator);
                 if (validation) {
                     setErrors({
                         ...errors,
@@ -69,17 +126,12 @@ export const useForm = <T>(InitialState: FormValues<T>) => {
         errors,
         ValidateInput,
         ValidateSubmit,
-        validators,
-        addValidationRules
+        validationRules,
+        addValidationRules,
+        setValidators
     }
     
 }
 
-export const Validators = {
-    Required: ()=> ({type: 'required', data: null}),
-    Email: (regex: string | null = null)=> ({type: 'email', data: regex}),
-    minLength: (length: number)=> ({type: 'minLength', data: length}),
-    maxLength: (length: number)=> ({type: 'maxLength', data: length}),
-    min: (length: number)=> ({type: 'min', data: length}),
-    max: (length: number)=> ({type: 'max', data: length})
-}
+
+export const defaultValidators = Validators;

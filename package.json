@@ -1,6 +1,6 @@
 {
   "name": "react-reforms",
-  "version": "0.0.2",
+  "version": "0.0.29",
   "description": "This librarie help to create a reactive forms like angular",
   "main": "lib/index.js",
   "scripts": {
@@ -15,7 +15,15 @@
     "reactive",
     "custom"
   ],
-  "author": "Juan Camilo Bonilla",
+  "author": {
+    "email": "cam960210@gmail.com",
+    "name": "Juan Camilo Castaño Bonilla",
+    "url": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/XeresRed/ReForm.git"
+  },
   "license": "ISC",
   "peerDependencies": {
     "react": "^16.8.0"
@@ -31,5 +39,6 @@
   "files": [
     "/lib",
     "package.json"
-  ]
+  ],
+  "dependencies": {}
 }

@@ -1,11 +1,9 @@
-export interface Values<T> {
+import { Primitives, ValidatorType } from './Validators.models';
+export interface Values {
     value: string;
-    validators: {
-        type: string;
-        data: T;
-    }[];
+    validators: ValidatorType<Primitives<any>>[];
     class?: string;
 }
-export declare type FormValues<T> = {
-    [K in keyof T]: Values<T[K]>;
+export declare type FormValues = {
+    [k: string]: Values;
 };

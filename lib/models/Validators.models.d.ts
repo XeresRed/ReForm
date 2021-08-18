@@ -1,15 +1,48 @@
-export interface Validator<K> {
-    type: string;
-    data: K;
+import { IExtrasConfig } from "./Config";
+export declare type Primitives<T> = boolean | string | number | null | undefined | T | Array<T> | object;
+export interface IDefaultValidators {
+    Required: () => ({
+        readonly type: string;
+        data: Primitives<null>;
+    });
+    Email: (regex: string | null) => ({
+        readonly type: string;
+        data: Primitives<string | null>;
+    });
+    MinLength: (length: number) => ({
+        readonly type: string;
+        data: Primitives<number>;
+    });
+    MaxLength: (length: number) => ({
+        readonly type: string;
+        data: Primitives<number>;
+    });
+    Min: (length: number) => ({
+        readonly type: string;
+        data: Primitives<number>;
+    });
+    Max: (length: number) => ({
+        readonly type: string;
+        data: Primitives<number>;
+    });
 }
-export declare type ValidationType<T, S> = {
-    [K in keyof T]: (value: T, validator: Validator<S>) => boolean;
-};
-export declare const ValidationRules: {
-    email: (value: string, validator?: Validator<string> | undefined) => boolean;
-    required: <T>(value: T) => boolean;
-    max: (value: number, validator: Validator<number>) => boolean;
-    min: (value: number, validator: Validator<number>) => boolean;
-    maxLength: (value: string | Array<any> | object, validator: Validator<number>) => boolean;
-    minLength: (value: string | Array<any> | object, validator: Validator<number>) => boolean;
-};
+export interface ValidatorFunctionalType {
+    [k: string]: <T>(data?: Primitives<T>, extras?: IExtrasConfig) => {
+        type: string;
+        data: Primitives<T>;
+        extras?: IExtrasConfig;
+    };
+}
+export declare type TValidator = ValidatorFunctionalType & IDefaultValidators;
+export declare const Validators: TValidator;
+export interface ValidatorType<T> {
+    type: string;
+    data: Primitives<T>;
+    extras?: IExtrasConfig;
+}
+export interface ValidationType {
+    [key: string]: <T, S>(value: Primitives<T>, validator?: ValidatorType<S>) => {
+        [key: string]: boolean;
+    };
+}
+export declare const ValidationRules: ValidationType;
