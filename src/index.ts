@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
+import { validate } from './core/validate';
 import { Config } from './models/Config';
 import { FormValues, Values } from './models/FormValues.models';
 import { ValidationRules, ValidationType, Validators, ValidatorType, Primitives  } from './models/Validators.models';
@@ -37,33 +38,37 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
         }
     }, [])
 
-
-    const ValidateInput = (id: string, value: any) => {
-        const field: Values = values[id];
-        let flagError = [];
+   
+    /**
+     * This function validate the current value pass for all validators of the field
+     * @param {string} fieldName refers to name of the field on the form structure
+     * @param {T} value refers to the input of the fields
+     * @returns {void} 
+     */
+    const ValidateInput = useMemo( () => <T>(fieldName: string, value: T) => {
+        const field: Values = values[fieldName];
+        let hasErrors = false;
         let resultErrors = {};
         for (const validator of field.validators) {
             if (validator.extras) {
-                if (validator.extras.bindField && validator.extras.bindField.activate) {
+                if (validator.extras.bindField) {
                     try {
-                        validator.data = values[validator.extras.bindField.field].value;
+                        validator.data = values[validator.extras.bindField].value;
                     } catch (error) {
                         setErrors({
                             ...errors,
-                            [id]: {...errors[id], ...{Exception: error}}
+                            [fieldName]: {...errors[fieldName], ...{Unexpecte: `The binding field doesn't exist or not could be use`}}
                         })
                         return;
                     }
                 }
             }
-            const validation = validationRules[validator.type](value, validator);
-            if (validation[validator.type]) {
-                flagError.push(false)
-            }
+            const {result, validation} = validate(ValidationRules, validator, value);
+            if (result) hasErrors = true
 
             resultErrors = {
                 ...resultErrors,
-                [id]: {...resultErrors[id], ...validation}
+                [fieldName]: {...resultErrors[fieldName], ...validation}
             }
         }
 
@@ -74,34 +79,46 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
 
         setValues({
             ...values,
-            [id]: {
-                validators: values[id].validators,
+            [fieldName]: {
+                validators: values[fieldName].validators,
                 value: value,
-                class: flagError.length === 0 ? config.customClass?.success : config.customClass?.error,
-                hasErrors: !(flagError.length === 0)
+                class: !hasErrors ? config.customClass?.success : config.customClass?.error,
+                hasErrors
             }
         });
 
-    }
+    }, [values, validationRules, errors, setErrors])
 
-    const addValidationRules = (newRules: ValidationType) => {
+    /**
+     * Add new rule validation to the current form
+     * @param {ValidationType} newRules object of rules
+     * @returns {void}
+     */
+    const addValidationRules = useMemo( () => (newRules: ValidationType) => {
         SetValidationRules({
             ...validationRules,
             ...newRules
         })
-    }
+    }, [validationRules, SetValidationRules])
 
-    const setValidators= <T>(formField: string, validator: ValidatorType<Primitives<T>>[]) => {
+
+    /**
+     * Set a group of validators to a field, **this method delete old validators from your field, you need assing again**
+     * @param {string} formField refers to name of the field on the form structure
+     * @param {ValidatorType[]} validators Array of validators
+     * @returns {boolean}
+     */
+    const setValidators= useMemo( () => <T>(formField: string, validators: ValidatorType<Primitives<T>>[]) => {
         if (!(formField in values)) return false
 
         const val = {...values[formField]}
-        val.validators = validator
+        val.validators = validators
         setValues({
             ...values,
             [formField]: val
         });
         return true
-    }
+    }, [values, setValues])
 
     const ValidateSubmit = () => {
         for (const keyValue of Object.keys(values)) {

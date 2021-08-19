@@ -9,9 +9,10 @@ export interface Config {
     };
 }
 export interface IExtrasConfig {
-    bindField?: {
-        activate: boolean;
-        field: string;
+    bindField?: string;
+    validationMessage?: {
+        successMessage: string;
+        errorMessage: string;
     };
 }
 export interface IValidationRulesConfig {

@@ -4,10 +4,11 @@ export interface Config {
 }
 
 export interface IExtrasConfig {
-    bindField?: {
-        activate: boolean;
-        field: string;
-    };
+    bindField?: string;
+    validationMessage?: {
+        success: string;
+        error: string;
+    }
 }
 export interface IValidationRulesConfig {
     acceptData: boolean

@@ -42,7 +42,7 @@ export interface ValidatorType<T> {
 }
 export interface ValidationType {
     [key: string]: <T, S>(value: Primitives<T>, validator?: ValidatorType<S>) => {
-        [key: string]: boolean;
+        [key: string]: boolean | string;
     };
 }
 export declare const ValidationRules: ValidationType;

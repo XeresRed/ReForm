@@ -35,11 +35,11 @@ export const Validators: TValidator = {
 export interface ValidatorType<T> {
     type: string;
     data: Primitives<T>;
-    extras?: IExtrasConfig
+    extras?: IExtrasConfig;
 
 }
 export interface ValidationType {
-    [key: string]: <T, S>(value: Primitives<T>, validator?: ValidatorType<S>) => {[key:string]: boolean}
+    [key: string]: <T, S>(value: Primitives<T>, validator?: ValidatorType<S>) => {[key:string]: boolean }
 }
 
 

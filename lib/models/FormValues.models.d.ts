@@ -1,6 +1,6 @@
 import { Primitives, ValidatorType } from './Validators.models';
 export interface Values {
-    value: string;
+    value: Primitives<any>;
     validators: ValidatorType<Primitives<any>>[];
     class?: string;
     hasErrors?: boolean;

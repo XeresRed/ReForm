@@ -28,7 +28,7 @@ const formStructure = {
 		class: ''
 	},
 	age: {
-		value: "",
+		value: 15,
 		validators: [defaultValidators.Min(18), defaultValidators.Max(32)],
 		class: ''
 	}
@@ -39,18 +39,18 @@ function App() {
 	return (
 		<form  style={{marginTop: '12%'}} onSubmit={ e  =>  onSubmit(e)}>
 			<div  className="form-control"  style={{margin: '5% 0'}}>
-				<input  type="text"  id="firstName"  name="firstName" onChange={e  =>  			ValidateInput(e.target.name, e.target.value)} className={`${values.firstName.class}`} />
+				<input  type="text"  id="firstName"  name="firstName" onChange={e  => ValidateInput(e.target.name, e.target.value)} className={`${values.firstName.class}`} />
 			</div>
 			<div  className="form-control"  style={{margin: '5% 0'}}>
-				<input  type="text"  id="lastName"  name="lastName" onChange={e  =>  ValidateInput(e.target.name, e.target.value)} className={`${values.repeatPass.class}`} />
+				<input  type="text"  id="lastName"  name="lastName" onChange={e  => ValidateInput(e.target.name, e.target.value)} className={`${values.repeatPass.class}`} />
 			</div>
 			<div  className="form-control"  style={{margin: '5% 0'}}>
-				<input  type="email"  id="email"  name="email" onChange={e  =>  ValidateInput(e.target.name, e.target.value)} className={`${values.email.class}`} />
+				<input  type="email"  id="email"  name="email" onChange={e  => ValidateInput(e.target.name, e.target.value)} className={`${values.email.class}`} />
 			</div>
 			<button  type="submit"  className="primary"  style={{right: '2%', width: "10rem"}}>
 				Send
 			</button>
-	</form>
+		</form>
 	);
 }
 
@@ -67,6 +67,27 @@ function App() {
 | **addValidationRules** | Allow create custom validation rules |
 | **setValidators** | Allow set custom validations to forms fields | 
 
+#### useForm config
+you can provide some configurations for the hook
+
+```json
+{
+	"customClass": {
+		"error": "error", // return this custom class when the validator fail
+		"success": "success" // return this custom class when the validator pass
+	}
+}
+```
+
+#### Form structure
+To create the forms fields we need lest two elements how it show the next table.
+|  Field                | Description  |
+|:----------------------|:-------------|
+| **value**             | **Requiered**, It's the value of the field you can init |
+| **validators**        | **Requiered**, It's the array of validators you can set, if you don't want set any validator you can pass a empty array |
+| **class**             | **Optional**, If you put a customClass to return in the config of useForm this parameter reflect that. |
+| **hasError**          | **Optional**, Indicate if this field pass or not all validatiors, it's true if fail any validation and false if pass all validation |
+
 
 ## Custom validators
 We  make a custom validator for validate the password  match with repeated password.
@@ -76,6 +97,15 @@ First need to create a custom validators:
 const CustomValidators = {
 	...defaultValidators,
 	repeatPass: (extras:  IExtrasConfig) => ({type: 'repeatPass', data: null, extras})
+}
+```
+
+
+#### Interface IExtrasConfig
+
+```typescript
+interface IExtrasConfig {
+    bindField?: string;
 }
 ```
 
@@ -95,7 +125,7 @@ function App() {
 	const {values, errors, ValidateInput, addValidationRules, setValidators} =  useForm(formStructure, {customClass: {error: 'error', success: 'success'}});
      React.useEffect( () => {
         addValidationRules(CustomRulesValidations)
-        setValidators('repeatPass',  [CustomValidators.repeatPass({bindField: {field:'firstName', activate: true}})])
+        setValidators('repeatPass',  [CustomValidators.repeatPass({bindField: 'firstName'})])
     },[])
 	....
 ```
