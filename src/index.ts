@@ -45,7 +45,7 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
      * @param {T} value refers to the input of the fields
      * @returns {void} 
      */
-    const ValidateInput = useMemo( () => <T>(fieldName: string, value: T) => {
+    const ValidateInput = React.useCallback( <T>(fieldName: string, value: T) => {
         const field: Values = values[fieldName];
         let hasErrors = false;
         let resultErrors = {};
@@ -94,7 +94,7 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
      * @param {ValidationType} newRules object of rules
      * @returns {void}
      */
-    const addValidationRules = useMemo( () => (newRules: ValidationType) => {
+    const addValidationRules = React.useCallback( (newRules: ValidationType) => {
         SetValidationRules({
             ...validationRules,
             ...newRules
@@ -108,7 +108,7 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
      * @param {ValidatorType[]} validators Array of validators
      * @returns {boolean}
      */
-    const setValidators= useMemo( () => <T>(formField: string, validators: ValidatorType<Primitives<T>>[]) => {
+    const setValidators= React.useCallback( <T>(formField: string, validators: ValidatorType<Primitives<T>>[]) => {
         if (!(formField in values)) return false
 
         const val = {...values[formField]}
@@ -140,6 +140,25 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
         }
     }
 
+    const valid = () => {
+        let isValid = true;
+        Object.keys(values).forEach( key => {
+            if (!('hasErrors' in values[key])) {
+                isValid = false;
+                return;
+            }
+            isValid = isValid && (values[key].hasErrors as boolean);
+        })
+        return isValid;
+    }
+
+    const getFormValues = () => {
+        return Object.keys(values).reduce( (response,current) => {
+            response[current] = values[current].value;
+            return response
+        }, {})
+    }
+
 
     return {
         values,
@@ -148,7 +167,9 @@ export const useForm = (InitialState: FormValues, config: Config = initConfig) =
         ValidateSubmit,
         validationRules,
         addValidationRules,
-        setValidators
+        setValidators,
+        valid,
+        getFormValues
     }
     
 }

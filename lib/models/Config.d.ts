@@ -11,8 +11,8 @@ export interface Config {
 export interface IExtrasConfig {
     bindField?: string;
     validationMessage?: {
-        successMessage: string;
-        errorMessage: string;
+        success: string;
+        error: string;
     };
 }
 export interface IValidationRulesConfig {
